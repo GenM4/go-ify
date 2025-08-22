@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
+	"github.com/GenM4/go-ify/internal/responses"
 	"github.com/joho/godotenv"
 )
 
@@ -22,50 +24,206 @@ func main() {
 		SecretKey: os.Getenv("SECRET_KEY"),
 	}
 
+	cfg.Client = &http.Client{}
 	cfg.getAccessKey()
 
-	client := http.Client{}
+	fmt.Println("Enter a spotify share URL:")
+	var rawURL string
+	_, err = fmt.Scanln(&rawURL)
+	if err != nil {
+		log.Fatal("Invalid input")
+	}
+	fmt.Println()
 
-	fmt.Println("Enter a spotify artist URL:")
-	var artistURL string
-	_, err = fmt.Scanln(&artistURL)
+	asset := cfg.parseInput(rawURL)
 
-	req, err := http.NewRequest(http.MethodGet, artistURL, http.NoBody)
+	r := cfg.GetSpotifyAsset(asset)
+
+	r.Log()
+
+}
+
+type SpotifyAsset struct {
+	Type string
+	ID   string
+}
+
+type ApiConfig struct {
+	ClientID            string
+	SecretKey           string
+	Client              *http.Client
+	AccessToken         string
+	AccessTokenType     string
+	AccessTokenDuration int
+}
+
+func (cfg *ApiConfig) parseInput(rawURL string) SpotifyAsset {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cutPath := strings.Split(strings.TrimLeft(parsedURL.Path, "/"), "/")
+	asset := SpotifyAsset{
+		Type: cutPath[0],
+		ID:   cutPath[1],
+	}
+
+	return asset
+}
+
+func (cfg *ApiConfig) GetSpotifyAsset(asset SpotifyAsset) responses.SpotifyType {
+	url := url.URL{
+		Scheme: "https",
+		Host:   "api.spotify.com",
+		Path:   "v1/" + asset.Type + "s/" + asset.ID,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), http.NoBody)
+	if err != nil {
+		log.Print("Error building " + asset.Type + " request")
+	}
+	req.Header.Add("Authorization", cfg.AccessTokenType+"  "+cfg.AccessToken)
+
+	res, err := cfg.Client.Do(req)
+	if err != nil {
+		log.Print("Error sending " + asset.Type + " request")
+	}
+
+	var r responses.SpotifyType
+	switch asset.Type {
+	case "track":
+		r = &responses.Track{}
+	case "artist":
+		r = &responses.Artist{}
+	case "album":
+		r = &responses.Album{}
+	case "playlist":
+		r = &responses.Playlist{}
+	default:
+		log.Fatalf("Unknown Spotify asset request: %s", asset.Type)
+	}
+
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&r)
+	if err != nil {
+		log.Print("Error decoding " + asset.Type + " response")
+	}
+
+	return r
+
+}
+
+func (cfg *ApiConfig) getTrack(trackID string) responses.Track {
+	url := url.URL{
+		Scheme: "https",
+		Host:   "api.spotify.com",
+		Path:   "v1/tracks/" + trackID,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), http.NoBody)
+	if err != nil {
+		log.Print("Error building track request")
+	}
+	req.Header.Add("Authorization", cfg.AccessTokenType+"  "+cfg.AccessToken)
+
+	res, err := cfg.Client.Do(req)
+	if err != nil {
+		log.Print("Error sending track request")
+	}
+
+	trackRes := responses.Track{}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&trackRes)
+	if err != nil {
+		log.Print("Error decoding track response")
+	}
+
+	return trackRes
+}
+
+func (cfg *ApiConfig) getArtist(artistID string) responses.Artist {
+	url := url.URL{
+		Scheme: "https",
+		Host:   "api.spotify.com",
+		Path:   "v1/artists/" + artistID,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), http.NoBody)
 	if err != nil {
 		log.Print("Error building artist request")
 	}
 	req.Header.Add("Authorization", cfg.AccessTokenType+"  "+cfg.AccessToken)
 
-	res, err := client.Do(req)
+	res, err := cfg.Client.Do(req)
 	if err != nil {
 		log.Print("Error sending artist request")
 	}
 
-	type response struct {
-		Name       string `json:"name"`
-		Popularity int    `json:"popularity"`
-		Type       string `json:"type"`
-	}
-
-	artistRes := response{}
+	artistRes := responses.Artist{}
 	d := json.NewDecoder(res.Body)
 	err = d.Decode(&artistRes)
 	if err != nil {
 		log.Print("Error decoding artist token response")
 	}
 
-	fmt.Println(artistRes.Name)
-	fmt.Println(artistRes.Popularity)
-	fmt.Println(artistRes.Type)
-
+	return artistRes
 }
 
-type ApiConfig struct {
-	ClientID            string
-	SecretKey           string
-	AccessToken         string
-	AccessTokenType     string
-	AccessTokenDuration int
+func (cfg *ApiConfig) getAlbum(albumID string) responses.Album {
+	url := url.URL{
+		Scheme: "https",
+		Host:   "api.spotify.com",
+		Path:   "v1/albums/" + albumID,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), http.NoBody)
+	if err != nil {
+		log.Print("Error building album request")
+	}
+	req.Header.Add("Authorization", cfg.AccessTokenType+"  "+cfg.AccessToken)
+
+	res, err := cfg.Client.Do(req)
+	if err != nil {
+		log.Print("Error sending album request")
+	}
+
+	albumRes := responses.Album{}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&albumRes)
+	if err != nil {
+		log.Print("Error decoding album response")
+	}
+
+	return albumRes
+}
+
+func (cfg *ApiConfig) getPlaylist(playlistID string) responses.Playlist {
+	url := url.URL{
+		Scheme: "https",
+		Host:   "api.spotify.com",
+		Path:   "v1/playlists/" + playlistID,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url.String(), http.NoBody)
+	if err != nil {
+		log.Print("Error building playlist request")
+	}
+	req.Header.Add("Authorization", cfg.AccessTokenType+"  "+cfg.AccessToken)
+
+	res, err := cfg.Client.Do(req)
+	if err != nil {
+		log.Print("Error sending playlist request")
+	}
+
+	playlistRes := responses.Playlist{}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&playlistRes)
+	if err != nil {
+		log.Print("Error decoding playlist response")
+	}
+
+	return playlistRes
 }
 
 func (cfg *ApiConfig) getAccessKey() {
@@ -75,7 +233,7 @@ func (cfg *ApiConfig) getAccessKey() {
 	body.Set("client_id", cfg.ClientID)
 	body.Set("client_secret", cfg.SecretKey)
 
-	res, err := http.PostForm(tokenURL, body)
+	res, err := cfg.Client.PostForm(tokenURL, body)
 	if err != nil {
 		log.Print("Error with access token request")
 	}
