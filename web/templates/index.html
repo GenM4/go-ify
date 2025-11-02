@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
+    <title>go-ify</title>
+</head>
+
+<body class="flex-container">
+    <h1>Welcome!</h1>
+        <div class="center flex-container"> 
+        <form hx-post="/processShareURL/" hx-target="#assetList" hx-swap="beforeend" class="center">
+            <label for="sURL">Paste Spotify Share URL:</label>
+            <input type="text" id="sURL" name="SpotifyURL">
+            <input type="submit" value="Submit">
+        </form> 
+        </div>
+        <div class="center flex-container"> 
+        <ul class="center" id="assetList">
+                {{ range .Assets }}
+                {{ block "assetListElement" .}}
+                    <li> {{ .Title }} </li>
+                {{ end }}
+                {{ end }}
+        </ul>
+    </div>
+</body>
+
+</html>

@@ -19,14 +19,17 @@ goosedown:
 sqlc:
 	sqlc generate
 
-dockerc:
-	docker build -t homelab-homepage-image .
-	docker stop hhl
-	docker rm hhl
-	docker container create -p 8080:8080 --name hhl homelab-homepage-image
+dockerb:
+	docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
+	docker image prune -fa
 
 dockerup:
-	docker start hhl
+	docker compose -f ./build/docker/docker-compose.yaml up
 
 dockerdown:
-	docker stop hhl
+	docker compose -f ./build/docker/docker-compose.yaml down
+
+rebuild:
+	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
+	sudo docker compose -f ./build/docker/docker-compose.yaml up
+	sudo docker image prune -fa

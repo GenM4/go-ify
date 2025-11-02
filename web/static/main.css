@@ -1,0 +1,63 @@
+h1 {
+    font-family: Tahoma;
+    background-color: #40f99b;
+    text-align: center;
+    text-color: #2d3334;
+}
+
+body {
+    font-family: Tahoma;
+    background-color: #464f51;
+    text-color: #edf5fc;
+
+}
+
+a:link {
+    color: #edf5fc;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #edf5fc;
+}
+
+a:hover {
+    color: #329f5b;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#srvlist {
+    display: flex;
+}
+
+#srvlist li {
+    text-align: center;
+}
+
+#srvlist li a {
+    display: block;
+    width: 120px;
+    height: 120px;
+    margin: 15px;
+    border-radius: 15px;
+    background-color: #40f99b;
+    color: #2d3334;
+    line-height: 120px;
+}
+
+.center {
+    margin: auto;
+    width: 60%;
+    padding: 15px;
+}
+
+.flex-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Or 100% if parent is already 100vh */
+

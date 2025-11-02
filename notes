@@ -1,3 +1,0 @@
-api key
-    implement re-request after expiry (1hr)
-    use Ticker.AfterFunc()
