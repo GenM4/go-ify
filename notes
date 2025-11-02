@@ -1,0 +1,16 @@
+api
+    implement re-request after expiry (1hr)
+    use Ticker.AfterFunc()
+
+services
+    implement layer
+    implemented
+
+handlers
+    dependency injection
+    implemented
+
+html
+    implement templ
+
+logging

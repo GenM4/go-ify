@@ -4,6 +4,23 @@ app:
 run:
 	air
 
+dockerb:
+	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
+
+dockerp:
+	sudo docker image prune -fa
+
+dockerup:
+	sudo docker compose -f ./build/docker/docker-compose.yaml up 
+
+dockerdown:
+	sudo docker compose -f ./build/docker/docker-compose.yaml down
+
+rebuild:
+	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
+	sudo docker compose -f ./build/docker/docker-compose.yaml up
+	sudo docker image prune -fa
+
 startdb:
 	sudo service postgresql start
 
@@ -19,17 +36,3 @@ goosedown:
 sqlc:
 	sqlc generate
 
-dockerb:
-	docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
-	docker image prune -fa
-
-dockerup:
-	docker compose -f ./build/docker/docker-compose.yaml up
-
-dockerdown:
-	docker compose -f ./build/docker/docker-compose.yaml down
-
-rebuild:
-	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
-	sudo docker compose -f ./build/docker/docker-compose.yaml up
-	sudo docker image prune -fa

@@ -1,9 +1,6 @@
 package main
 
 import (
-	//"fmt"
-
-	//"github.com/GenM4/go-ify/internal/api"
 	"log"
 
 	"github.com/GenM4/go-ify/internal/config"
@@ -19,34 +16,18 @@ func main() {
 	}
 
 	log.Print("Building Server")
-	server := server.NewServer(&gcfg)
+	server := server.NewServer(gcfg.ServerConfig)
 
 	log.Print("Initializing Server")
-	server.Init()
+	if err := server.Init(); err != nil {
+		log.Print("Failed to initailize server")
+		log.Print(err)
+		panic(err)
+	}
 	log.Print("Server Initialized!")
 
 	if err := server.Serve(); err != nil {
 		log.Print("Failed to start server")
 		panic(err)
 	}
-
-	//--------------------------------  \/ figure out where this shit goes
-	/*
-		spotifyApi := api.SpotifyApiInit(gcfg)
-
-		fmt.Println("Enter a spotify share URL:")
-		var rawURL string
-		_, err := fmt.Scanln(&rawURL)
-		if err != nil {
-			log.Fatal("Invalid input")
-		}
-		fmt.Println()
-
-		asset := spotifyApi.ParseInput(rawURL)
-
-		r := spotifyApi.GetSpotifyAsset(asset)
-
-		r.Log()
-	*/
-
 }

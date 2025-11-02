@@ -13,18 +13,20 @@ const (
 	configPath = "./configs/global.yaml"
 )
 
+type ServerConfig struct {
+	Address     string `yaml:"addr"`
+	Port        string `yaml:"port"`
+	WebFileRoot string `yaml:"root"`
+	AppPrefix   string `yaml:"appPfx"`
+	ApiPrefix   string `yaml:"apiPfx"`
+	AdminPrefix string `yaml:"admPfx"`
+}
+
 type GCFG struct {
 	API struct {
 		ClientTimeout time.Duration
 	}
-	Server struct {
-		Address     string `yaml:"addr"`
-		Port        string `yaml:"port"`
-		WebRoot     string `yaml:"root"`
-		AppPrefix   string `yaml:"appPfx"`
-		ApiPrefix   string `yaml:"apiPfx"`
-		AdminPrefix string `yaml:"admPfx"`
-	} `yaml:"server"`
+	*ServerConfig `yaml:"server"`
 }
 
 func (cfg *GCFG) Init() error {
@@ -56,10 +58,12 @@ func (cfg *GCFG) Init() error {
 func (cfg *GCFG) initDefaultConfig() {
 	cfg.API.ClientTimeout = 500000
 
-	cfg.Server.Address = ""
-	cfg.Server.Port = "8080"
-	cfg.Server.WebRoot = "./web/"
-	cfg.Server.AppPrefix = "/app"
-	cfg.Server.ApiPrefix = "/api"
-	cfg.Server.AdminPrefix = "/admin"
+	cfg.ServerConfig = &ServerConfig{
+		Address:     "",
+		Port:        "8080",
+		WebFileRoot: "./web/",
+		AppPrefix:   "/app",
+		ApiPrefix:   "/api",
+		AdminPrefix: "/admin",
+	}
 }

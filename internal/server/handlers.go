@@ -1,11 +1,18 @@
 package server
 
 import (
-	"fmt"
-	"github.com/GenM4/go-ify/internal/api"
+	"github.com/GenM4/go-ify/internal/services"
 	"html/template"
 	"net/http"
 )
+
+type SpotifyHandler struct {
+	Service *services.SpotifyRetriever
+}
+
+func NewSpotifyHandler(s *services.SpotifyRetriever) *SpotifyHandler {
+	return &SpotifyHandler{Service: s}
+}
 
 func (srv *Server) ReadinessHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
@@ -13,6 +20,7 @@ func (srv *Server) ReadinessHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte(http.StatusText(http.StatusOK)))
 }
 
+/* middleware
 func (srv *Server) RequestMade(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		srv.reqCount++
@@ -39,25 +47,28 @@ func (srv *Server) MetricsHandlerReqCounter(w http.ResponseWriter, req *http.Req
         <html>
     `, srv.reqCount)))
 }
+*/
 
 func (srv *Server) RedirectToHome(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func (srv *Server) MainPageHandler(w http.ResponseWriter, req *http.Request) {
-	tmpl := template.Must(template.ParseFiles(srv.webFileRoot + "/templates/index.html"))
+	tmpl := template.Must(template.ParseFiles(srv.Config.WebFileRoot + "templates/index.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func (srv *Server) ProcessShareURL(w http.ResponseWriter, req *http.Request) {
-	sAPI := api.SpotifyApiInit()
-
+func (h *SpotifyHandler) ServeTrackHTTP(w http.ResponseWriter, req *http.Request) {
 	url := req.PostFormValue("SpotifyURL")
-	r := sAPI.GetArtist(url)
+	track, err := h.Service.GetTrack(url)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	r := track
 
-	tmpl := template.Must(template.ParseFiles(srv.webFileRoot + "/templates/index.html"))
+	tmpl := template.Must(template.ParseFiles("./web/templates/index.html"))
 	if err := tmpl.ExecuteTemplate(w, "assetListElement", Asset{Title: r.Name}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
