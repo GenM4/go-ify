@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/GenM4/go-ify/internal/api"
 	"html/template"
-	"log"
 	"net/http"
 )
 
