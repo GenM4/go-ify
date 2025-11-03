@@ -38,3 +38,19 @@ templ AssetList(imageURL, name string) {
 		<li><img src={ imageURL }/>{ name }</li>
 	</ul>
 }
+
+templ PlaylistConfirm(imageURL, name string) {
+	<div class="center popup">
+		<img src={ imageURL }/>
+		<br/>
+		<h2>{ name }</h2>
+		<form class="center">
+			<label class="center">Is this the correct playlist?</label>
+			<br/>
+			<div class="center">
+				<button>NO</button>
+				<button>YES</button>
+			</div>
+		</form>
+	</div>
+}

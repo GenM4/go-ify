@@ -38,7 +38,7 @@ func (srv *Server) Init() error {
 	}
 	s := services.NewSpotifyRetriever(r)
 	h := NewSpotifyHandler(s)
-	mux.HandleFunc("/processShareURL/", h.ServeTrackHTTP)
+	mux.HandleFunc("/processShareURL/", h.ServePlaylistHTTP)
 
 	srv.Handler = mux
 

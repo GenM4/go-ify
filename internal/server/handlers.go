@@ -77,3 +77,14 @@ func (h *SpotifyHandler) ServeTrackHTTP(w http.ResponseWriter, req *http.Request
 	t := templates.AssetList(track.Album.Images[0].URL, track.Name)
 	t.Render(req.Context(), w)
 }
+
+func (h *SpotifyHandler) ServePlaylistHTTP(w http.ResponseWriter, req *http.Request) {
+	url := req.PostFormValue("SpotifyURL")
+	pl, err := h.Service.GetPlaylist(url)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	t := templates.PlaylistConfirm(pl.Images[0].URL, pl.Name)
+	t.Render(req.Context(), w)
+}

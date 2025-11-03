@@ -52,12 +52,22 @@ ul {
 
 .center {
     margin: auto;
-    width: 60%;
+    width: auto;
     padding: 15px;
 }
 
 .flex-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Or 100% if parent is already 100vh */
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Or 100% if parent is already 100vh */
+}
 
+.popup {
+    background-color: #303738;
+    .h2 {
+        font-family: Tahoma;
+        text-align: center;
+        text-color: #2d3334;
+    }
+
+}
