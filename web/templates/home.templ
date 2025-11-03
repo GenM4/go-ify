@@ -1,0 +1,40 @@
+package templates
+
+templ PublicHome(header string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="./static/main.css"/>
+			<script src="./static/htmx.min.js"></script>
+			<title>go-ify</title>
+		</head>
+		<body class="flex-container">
+			@PublicBackground(header)
+			@SpotifyURLForm()
+		</body>
+	</html>
+}
+
+templ PublicBackground(header string) {
+	<div>
+		<h1>{ header }</h1>
+	</div>
+}
+
+templ SpotifyURLForm() {
+	<div class="center flex-container" id="content">
+		<form hx-post="/processShareURL/" hx-target="#content" hx-swap="outerHTML" class="center">
+			<label for="sURL">Paste Spotify Share URL:</label>
+			<input type="text" id="sURL" name="SpotifyURL"/>
+			<input type="submit" value="Submit"/>
+		</form>
+	</div>
+}
+
+templ AssetList(imageURL, name string) {
+	<ul class="center" id="assetList">
+		<li><img src={ imageURL }/>{ name }</li>
+	</ul>
+}

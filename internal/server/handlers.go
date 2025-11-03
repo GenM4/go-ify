@@ -1,9 +1,11 @@
 package server
 
 import (
-	"github.com/GenM4/go-ify/internal/services"
-	"html/template"
+	"context"
 	"net/http"
+
+	"github.com/GenM4/go-ify/internal/services"
+	"github.com/GenM4/go-ify/web/templates"
 )
 
 type SpotifyHandler struct {
@@ -54,10 +56,15 @@ func (srv *Server) RedirectToHome(w http.ResponseWriter, req *http.Request) {
 }
 
 func (srv *Server) MainPageHandler(w http.ResponseWriter, req *http.Request) {
-	tmpl := template.Must(template.ParseFiles(srv.Config.WebFileRoot + "templates/index.html"))
-	if err := tmpl.Execute(w, nil); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	/*
+		tmpl := template.Must(template.ParseFiles(srv.Config.WebFileRoot + "templates/index.html"))
+		if err := tmpl.Execute(w, nil); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	*/
+
+	t := templates.PublicHome("Hello")
+	t.Render(context.Background(), w)
 }
 
 func (h *SpotifyHandler) ServeTrackHTTP(w http.ResponseWriter, req *http.Request) {
@@ -66,14 +73,7 @@ func (h *SpotifyHandler) ServeTrackHTTP(w http.ResponseWriter, req *http.Request
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	r := track
 
-	tmpl := template.Must(template.ParseFiles("./web/templates/index.html"))
-	if err := tmpl.ExecuteTemplate(w, "assetListElement", Asset{Title: r.Name}); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
-type Asset struct {
-	Title string
+	t := templates.AssetList(track.Album.Images[0].URL, track.Name)
+	t.Render(req.Context(), w)
 }

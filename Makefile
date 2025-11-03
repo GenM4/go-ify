@@ -5,6 +5,7 @@ run:
 	air
 
 dockerb:
+	go tool templ generate
 	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
 
 dockerp:
@@ -17,6 +18,7 @@ dockerdown:
 	sudo docker compose -f ./build/docker/docker-compose.yaml down
 
 rebuild:
+	go tool templ generate
 	sudo docker build -t go-ify-image:latest -f ./build/docker/Dockerfile .
 	sudo docker compose -f ./build/docker/docker-compose.yaml up
 	sudo docker image prune -fa
